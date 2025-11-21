@@ -1,4 +1,10 @@
-import { useMemo, useState, type KeyboardEvent } from 'react';
+import {
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+   type KeyboardEvent,
+} from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
@@ -22,6 +28,8 @@ type Message = {
 const Chatbot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
    const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
+
+   const formRef = useRef<HTMLFormElement | null>(null);
 
    const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
@@ -60,6 +68,17 @@ const Chatbot = () => {
       }
    };
 
+   // Handle scroll to bottom on new message
+   const scrollToBottom = () => {
+      if (formRef.current) {
+         formRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+   };
+
+   useEffect(() => {
+      scrollToBottom();
+   }, [messages, isBotTyping]);
+
    return (
       <div className="max-w-3xl mx-auto">
          <div className="flex flex-col gap-3 mb-10">
@@ -82,6 +101,7 @@ const Chatbot = () => {
             onSubmit={handleSubmit(onSubmit)}
             onKeyDown={onKeyDown}
             className="flex flex-col gap-2 items-end border-2 p-4 rounded-md"
+            ref={formRef}
          >
             <textarea
                {...register('userPrompt', {
