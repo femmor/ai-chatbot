@@ -1,21 +1,23 @@
 {
-  "name": "ai-chatbot",
-  "workspaces": [
-    "packages/*"
-  ],
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "dev": "bun run index.ts"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "concurrently": "^9.2.1"
-  }
+   "name": "ai-chatbot",
+   "workspaces": [
+      "packages/*"
+   ],
+   "module": "index.ts",
+   "type": "module",
+   "private": true,
+   "scripts": {
+      "dev": "bun run index.ts",
+      "format": "prettier --write ."
+   },
+   "devDependencies": {
+      "@types/bun": "latest"
+   },
+   "peerDependencies": {
+      "typescript": "^5"
+   },
+   "dependencies": {
+      "concurrently": "^9.2.1",
+      "prettier": "^3.6.2"
+   }
 }
