@@ -15,7 +15,7 @@ const App = () => {
          <p className="text-green-600 text-center text-2xl">{message}</p>
          <div className="mt-4">
             <Button onClick={() => console.log('Button Clicked!')}>
-               Click me
+               Click Me Boy!!
             </Button>
          </div>
       </div>
