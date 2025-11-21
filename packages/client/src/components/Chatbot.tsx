@@ -1,20 +1,25 @@
+import { useMemo, type KeyboardEvent } from 'react';
+import axios from 'axios';
+import { useForm } from 'react-hook-form';
 import { Button } from './ui/button';
 import { FaArrowUp } from 'react-icons/fa';
-import { useForm } from 'react-hook-form';
-import type { KeyboardEvent } from 'react';
 
 type FormData = {
    userPrompt: string;
 };
 
 const Chatbot = () => {
+   const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
    // Handle form submission
-   const onSubmit = (data: FormData) => {
-      console.log('User Prompt:', data.userPrompt);
-      // Here you would typically send the prompt to your backend API
+   const onSubmit = async ({ userPrompt }: FormData) => {
       reset();
+      const { data } = await axios.post('/api/chat', {
+         userPrompt,
+         conversationId,
+      });
+      console.log('API Response:', data);
    };
 
    // Handle Enter key to submit the form
