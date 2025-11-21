@@ -11,7 +11,7 @@ const App = () => {
   }, [])
 
   return (
-    <div>{message}</div>
+    <div className="text-4xl text-green-500">{message}</div>
   )
 }
 export default App
