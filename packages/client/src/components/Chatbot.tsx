@@ -30,7 +30,7 @@ const Chatbot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
    const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
 
-   const formRef = useRef<HTMLFormElement | null>(null);
+   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
    const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
@@ -46,7 +46,9 @@ const Chatbot = () => {
          },
       ]);
 
-      reset();
+      reset({
+         userPrompt: '',
+      });
       const { data } = await axios.post<ChatResponse>('/api/chat', {
          userPrompt,
          conversationId,
@@ -71,8 +73,8 @@ const Chatbot = () => {
 
    // Handle scroll to bottom on new message
    const scrollToBottom = () => {
-      if (formRef.current) {
-         formRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (lastMessageRef.current) {
+         lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
       }
    };
 
@@ -93,16 +95,17 @@ const Chatbot = () => {
    }, [messages, isBotTyping]);
 
    return (
-      <div className="max-w-3xl mx-auto">
-         <div className="flex flex-col gap-3 mb-10">
+      <div className="flex flex-col h-full">
+         <div className="flex flex-col flex-1 gap-3 mb-10 overflow-y-scroll">
             {messages.map((msg, index) => (
-               <p
+               <div
                   key={index}
                   onCopy={(e) => onCopyMessage(e, msg.content)}
                   className={`px-3 py-1 rounded-xl my-2 max-w-lg ${msg.role === 'user' ? 'bg-blue-600 text-white text-right ml-auto rounded-tr-none' : 'bg-gray-100 text-black text-left mr-auto rounded-tl-none'}`}
+                  ref={index === messages.length - 1 ? lastMessageRef : null}
                >
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
-               </p>
+               </div>
             ))}
             {isBotTyping && (
                <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-gray-100 text-black text-left mr-auto rounded-tl-none animate-pulse flex items-center gap-2">
@@ -115,7 +118,6 @@ const Chatbot = () => {
             onSubmit={handleSubmit(onSubmit)}
             onKeyDown={onKeyDown}
             className="flex flex-col gap-2 items-end border-2 p-4 rounded-md"
-            ref={formRef}
          >
             <textarea
                {...register('userPrompt', {
@@ -125,6 +127,7 @@ const Chatbot = () => {
                className="w-full border-0 focus:outline-0 resize-none"
                placeholder="Ask anything..."
                maxLength={1000}
+               autoFocus
             />
             <Button
                className="rounded-full w-9 h-9 cursor-pointer"
