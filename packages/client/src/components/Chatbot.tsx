@@ -1,6 +1,7 @@
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import ReactMarkdown from 'react-markdown';
 import { Button } from './ui/button';
 import { FaArrowUp } from 'react-icons/fa';
 
@@ -61,9 +62,9 @@ const Chatbot = () => {
             {messages.map((msg, index) => (
                <div
                   key={index}
-                  className={`px-3 py-1 rounded-xl my-2 max-w-lg ${msg.role === 'user' ? 'bg-blue-600 text-white text-right ml-auto rounded-tr-none' : 'bg-gray-800 text-white text-left mr-auto rounded-tl-none'}`}
+                  className={`px-3 py-1 rounded-xl my-2 max-w-lg ${msg.role === 'user' ? 'bg-blue-600 text-white text-right ml-auto rounded-tr-none' : 'bg-gray-100 text-black text-left mr-auto rounded-tl-none'}`}
                >
-                  <p>{msg.content}</p>
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
                </div>
             ))}
          </div>

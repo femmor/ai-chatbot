@@ -19,7 +19,7 @@ export const chatService = {
          model: 'gpt-4o-mini',
          input: userPrompt,
          temperature: 0.7,
-         max_output_tokens: 100,
+         max_output_tokens: 200,
          previous_response_id:
             conversationRepository.getLastResponseId(conversationId),
       });
