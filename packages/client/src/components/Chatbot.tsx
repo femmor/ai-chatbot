@@ -12,22 +12,39 @@ type ChatResponse = {
    message: string;
 };
 
+type Message = {
+   role: 'user' | 'bot';
+   content: string;
+};
+
 const Chatbot = () => {
-   const [messages, setMessages] = useState<string[]>([]);
+   const [messages, setMessages] = useState<Message[]>([]);
 
    const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
    // Handle form submission
    const onSubmit = async ({ userPrompt }: FormData) => {
-      setMessages((prevMessages) => [...prevMessages, userPrompt]);
+      setMessages((prevMessages) => [
+         ...prevMessages,
+         {
+            role: 'user',
+            content: userPrompt,
+         },
+      ]);
 
       reset();
       const { data } = await axios.post<ChatResponse>('/api/chat', {
          userPrompt,
          conversationId,
       });
-      setMessages((prevMessages) => [...prevMessages, data.message]);
+      setMessages((prevMessages) => [
+         ...prevMessages,
+         {
+            role: 'bot',
+            content: data.message,
+         },
+      ]);
    };
 
    // Handle Enter key to submit the form
@@ -39,10 +56,15 @@ const Chatbot = () => {
    };
 
    return (
-      <div>
-         <div>
+      <div className="max-w-3xl mx-auto">
+         <div className="flex flex-col gap-3 mb-10">
             {messages.map((msg, index) => (
-               <div key={index}>{msg}</div>
+               <div
+                  key={index}
+                  className={`px-3 py-1 rounded-xl my-2 max-w-lg ${msg.role === 'user' ? 'bg-blue-600 text-white text-right ml-auto rounded-tr-none' : 'bg-gray-800 text-white text-left mr-auto rounded-tl-none'}`}
+               >
+                  <p>{msg.content}</p>
+               </div>
             ))}
          </div>
          <form
@@ -55,7 +77,7 @@ const Chatbot = () => {
                   required: true,
                   validate: (value) => value.trim().length > 0,
                })}
-               className="w-full border-0 focus:outline-0 resize-none "
+               className="w-full border-0 focus:outline-0 resize-none"
                placeholder="Ask anything..."
                maxLength={1000}
             />
