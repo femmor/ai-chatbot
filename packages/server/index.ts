@@ -11,7 +11,7 @@ app.get('/alive', (req: Request, res: Response) => {
 });
 
 app.get("/api/status", (req: Request, res: Response) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+    res.json({ status: "Connected to the Backend!", timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
