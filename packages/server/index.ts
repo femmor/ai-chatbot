@@ -2,6 +2,7 @@ import express, { type Request, type Response } from 'express';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import z from 'zod';
+import { conversationRepository } from './repositories/conversation.repository';
 
 dotenv.config();
 
@@ -20,9 +21,6 @@ const PORT = process.env.PORT || 5005;
 app.get('/alive', (_req: Request, res: Response) => {
    res.send('Hello! Server is ALIVE!!!');
 });
-
-// Store conversation history in memory
-const conversations = new Map<string, string>();
 
 const chatSchema = z.object({
    userPrompt: z
@@ -55,17 +53,18 @@ app.post('/api/chat', async (req: Request, res: Response) => {
          input: userPrompt,
          temperature: 0.7,
          max_output_tokens: 100,
-         previous_response_id: conversations.get(conversationId) || undefined,
+         previous_response_id:
+            conversationRepository.getLastResponseId(conversationId),
       });
 
-      conversations.set(conversationId, response.id);
+      // set conversation history
+      conversationRepository.setLastResponseId(conversationId, response.id);
 
       res.json({
          message: response.output_text,
       });
    } catch (error) {
-      console.error('Error communicating with OpenAI:', error);
-      res.status(500).json({ error: 'Error communicating with the AI Agent' });
+      res.status(500).json({ error: 'Failed to generate a response' });
    }
 });
 
