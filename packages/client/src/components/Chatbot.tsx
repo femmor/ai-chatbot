@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
 import { Button } from './ui/button';
 import { FaArrowUp } from 'react-icons/fa';
+import { LuBot } from 'react-icons/lu';
 
 type FormData = {
    userPrompt: string;
@@ -20,12 +21,14 @@ type Message = {
 
 const Chatbot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
+   const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
 
    const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
    // Handle form submission
    const onSubmit = async ({ userPrompt }: FormData) => {
+      setIsBotTyping(true);
       setMessages((prevMessages) => [
          ...prevMessages,
          {
@@ -46,6 +49,7 @@ const Chatbot = () => {
             content: data.message,
          },
       ]);
+      setIsBotTyping(false);
    };
 
    // Handle Enter key to submit the form
@@ -67,6 +71,12 @@ const Chatbot = () => {
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                </div>
             ))}
+            {isBotTyping && (
+               <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-gray-100 text-black text-left mr-auto rounded-tl-none animate-pulse flex items-center gap-2">
+                  <LuBot size={24} />
+                  ...thinking
+               </div>
+            )}
          </div>
          <form
             onSubmit={handleSubmit(onSubmit)}
