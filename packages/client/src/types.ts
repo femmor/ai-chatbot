@@ -3,10 +3,14 @@ export type Message = {
    content: string;
 };
 
-export type FormData = {
+export type ChatFormData = {
    userPrompt: string;
 };
 
 export type ChatResponse = {
    message: string;
+};
+
+export type ChatInputProps = {
+   onSubmit: (data: ChatFormData) => Promise<void>;
 };
