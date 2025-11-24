@@ -29,6 +29,7 @@ type Message = {
 const Chatbot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
    const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
+   const [error, setError] = useState<string | null>(null);
 
    const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
@@ -37,30 +38,38 @@ const Chatbot = () => {
 
    // Handle form submission
    const onSubmit = async ({ userPrompt }: FormData) => {
-      setIsBotTyping(true);
-      setMessages((prevMessages) => [
-         ...prevMessages,
-         {
-            role: 'user',
-            content: userPrompt,
-         },
-      ]);
+      try {
+         setIsBotTyping(true);
+         setError(null);
+         setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+               role: 'user',
+               content: userPrompt,
+            },
+         ]);
 
-      reset({
-         userPrompt: '',
-      });
-      const { data } = await axios.post<ChatResponse>('/api/chat', {
-         userPrompt,
-         conversationId,
-      });
-      setMessages((prevMessages) => [
-         ...prevMessages,
-         {
-            role: 'bot',
-            content: data.message,
-         },
-      ]);
-      setIsBotTyping(false);
+         reset({
+            userPrompt: '',
+         });
+         const { data } = await axios.post<ChatResponse>('/api/chat', {
+            userPrompt,
+            conversationId,
+         });
+         setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+               role: 'bot',
+               content: data.message,
+            },
+         ]);
+         setIsBotTyping(false);
+      } catch (error) {
+         console.error(error);
+         setError('An error occurred while processing your request.');
+      } finally {
+         setIsBotTyping(false);
+      }
    };
 
    // Handle Enter key to submit the form
@@ -96,7 +105,7 @@ const Chatbot = () => {
 
    return (
       <div className="flex flex-col h-full">
-         <div className="flex flex-col flex-1 gap-3 mb-10 overflow-y-scroll">
+         <div className="flex flex-col flex-1 gap-3 mb-10 overflow-y-scroll p-2">
             {messages.map((msg, index) => (
                <div
                   key={index}
@@ -111,6 +120,11 @@ const Chatbot = () => {
                <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-gray-100 text-black text-left mr-auto rounded-tl-none animate-pulse flex items-center gap-2">
                   <LuBot size={24} />
                   ...thinking
+               </div>
+            )}
+            {error && (
+               <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-red-100 text-red-700 text-left mr-auto rounded-tl-none">
+                  {error}
                </div>
             )}
          </div>
