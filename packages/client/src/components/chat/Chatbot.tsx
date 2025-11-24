@@ -9,9 +9,9 @@ import {
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { FaArrowUp } from 'react-icons/fa';
-import { LuBot } from 'react-icons/lu';
+import TypingIndicator from './TypingIndicator';
 
 type FormData = {
    userPrompt: string;
@@ -116,12 +116,7 @@ const Chatbot = () => {
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                </div>
             ))}
-            {isBotTyping && (
-               <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-gray-100 text-black text-left mr-auto rounded-tl-none animate-pulse flex items-center gap-2">
-                  <LuBot size={24} />
-                  ...thinking
-               </div>
-            )}
+            {isBotTyping && <TypingIndicator />}
             {error && (
                <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-red-100 text-red-700 text-left mr-auto rounded-tl-none">
                   {error}
