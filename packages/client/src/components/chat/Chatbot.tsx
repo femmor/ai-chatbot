@@ -1,37 +1,16 @@
-import {
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-   type ClipboardEvent,
-   type KeyboardEvent,
-} from 'react';
+import { useMemo, useState, type KeyboardEvent } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
-import ReactMarkdown from 'react-markdown';
 import { Button } from '../ui/button';
 import { FaArrowUp } from 'react-icons/fa';
+import type { ChatResponse, FormData, Message } from '@/types';
 import TypingIndicator from './TypingIndicator';
-
-type FormData = {
-   userPrompt: string;
-};
-
-type ChatResponse = {
-   message: string;
-};
-
-type Message = {
-   role: 'user' | 'bot';
-   content: string;
-};
+import ChatMessages from './ChatMessages';
 
 const Chatbot = () => {
    const [messages, setMessages] = useState<Message[]>([]);
    const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
    const [error, setError] = useState<string | null>(null);
-
-   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
    const conversationId = useMemo(() => crypto.randomUUID(), []);
    const { register, handleSubmit, reset, formState } = useForm<FormData>();
@@ -80,42 +59,10 @@ const Chatbot = () => {
       }
    };
 
-   // Handle scroll to bottom on new message
-   const scrollToBottom = () => {
-      if (lastMessageRef.current) {
-         lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-   };
-
-   // Handle copy event to format copied text
-   const onCopyMessage = (
-      e: ClipboardEvent<HTMLParagraphElement>,
-      content: string
-   ) => {
-      e.preventDefault();
-      const selection = window.getSelection()?.toString().trim() || content;
-      if (selection) {
-         e.clipboardData.setData('text/plain', selection);
-      }
-   };
-
-   useEffect(() => {
-      scrollToBottom();
-   }, [messages, isBotTyping]);
-
    return (
       <div className="flex flex-col h-full">
          <div className="flex flex-col flex-1 gap-3 mb-10 overflow-y-scroll p-2">
-            {messages.map((msg, index) => (
-               <div
-                  key={index}
-                  onCopy={(e) => onCopyMessage(e, msg.content)}
-                  className={`px-3 py-1 rounded-xl my-2 max-w-lg ${msg.role === 'user' ? 'bg-blue-600 text-white text-right ml-auto rounded-tr-none' : 'bg-gray-100 text-black text-left mr-auto rounded-tl-none'}`}
-                  ref={index === messages.length - 1 ? lastMessageRef : null}
-               >
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
-               </div>
-            ))}
+            <ChatMessages messages={messages} />
             {isBotTyping && <TypingIndicator />}
             {error && (
                <div className="px-3 py-1 rounded-xl my-2 max-w-lg bg-red-100 text-red-700 text-left mr-auto rounded-tl-none">
